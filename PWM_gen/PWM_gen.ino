@@ -1,8 +1,11 @@
+#define THROTTLE_PIN A2
+#define OUTPUT_PIN 3
+
 void setup() {
-  pinMode(A2, INPUT);
-  pinMode(3, OUTPUT);
+  pinMode(THROTTLE_PIN, INPUT);
+  pinMode(OUTPUT_PIN, OUTPUT);
 }
 
 void loop() {
-  analogWrite(3, map(analogRead(A2), 0, 1023, 0, 255));
+  analogWrite(OUTPUT_PIN, (analogRead(THROTTLE_PIN) >> 2) - 10);
 }

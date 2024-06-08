@@ -1,89 +1,67 @@
+/*
+  e-bike computer firmware by Jan Kozub
+
+  pinout:
+  GPIO01 -> button
+
+  GPIO05 -> INT(CAN_BUS)
+  GPIO07 -> SCK(CAN_BUS)
+  GPIO09 -> MISO(CAN_BUS)
+  GPIO11 -> MOSI(CAN_BUS)
+  GPIO12 -> CS(CAN_BUS)
+
+  GPIO33 -> SDA(I2C)
+  GPIO35 -> SCL(I2C)
+*/
+
 #include <U8g2lib.h>
 #include <Wire.h>
+#include <mcp_can.h>
+#include "vesc_can_bus_arduino.h"
 
-#define THROTTLE_PIN 3
-#define MENU_BUTTON_PIN 5
+#define MENU_BUTTON_PIN 1
+#define PAGES_AMOUNT 3
 
-U8G2_SH1106_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, U8X8_PIN_NONE, 35, 33);
+#define SDA_PIN 33
+#define SCL_PIN 35
 
-#define LCDWidth u8g2.getDisplayWidth()
-#define ALIGN_CENTER(t) ((LCDWidth - (u8g2.getUTF8Width(t))) / 2)
-#define ALIGN_RIGHT(t) (LCDWidth - u8g2.getUTF8Width(t))
-#define ALIGN_LEFT 0
+#define CAN0_INT 5
+#define CAN_REFRESH_RATE 25  // time in ms
+
+#define MAX_BATTERY_VOLTAGE 33.6
+
+U8G2_SH1106_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, U8X8_PIN_NONE, SCL_PIN, SDA_PIN);
+CAN can;
 
 int currentPage = 0;
-bool menuButtonState = false;
-unsigned long pushTime = 0;
-unsigned long releaseTime = 0;
-int throttleRange[] = { 0, 8192 };
-
-double battery = 85.5;
-double current = 20.1;
-double voltage = 44.1;
+bool menuButtonState = true;
+unsigned long lastCanRead = 0;
+float inputVoltage, dutyCycle, inputCurrent, motorCurrent, vescTemp, motorTemp;
 
 void setup(void) {
-  u8g2.begin();
-  Serial.begin(115200);
-  pinMode(THROTTLE_PIN, INPUT);
   pinMode(MENU_BUTTON_PIN, INPUT_PULLUP);
+  pinMode(CAN0_INT, INPUT);
+
+  u8g2.begin();
+  can.initialize();
+  //Serial.begin(115200);
 }
 
 void loop(void) {
+  updateCanValues();
+  handleButtonPress();
+
   switch (currentPage) {
     case 0:
       drawMainPage();
       break;
     case 1:
-      u8g2.clearBuffer();
+      drawDevValues1();
+      break;
+    case 2:
+      drawDevValues2();
       break;
     default:
       drawMainPage();
-  }
-}
-
-void drawMainPage() {
-  u8g2.clearBuffer();
-  u8g2.drawBox(0, 64 - map(analogRead(THROTTLE_PIN), throttleRange[0], throttleRange[1], 0, 64), 20, 64);  //TODO filter noise on input
-  u8g2.drawBox(108, 64 - map(20.2, 0, 80, 0, 64), 20, 64);
-
-  u8g2.setFont(u8g2_font_10x20_tr);
-  printText(22, battery, '%');
-  printText(42, current, 'A');
-  printText(62, voltage, 'V');
-
-  u8g2.sendBuffer();
-
-  if (pushTime == 0 && digitalRead(MENU_BUTTON_PIN) == 0) {
-    pushTime = esp_timer_get_time();
-  }
-
-  if (pushTime > 0 && digitalRead(MENU_BUTTON_PIN) == 1) {
-    if (esp_timer_get_time() - pushTime > 5000000) {
-      configThrottle();
-    } else {
-      currentPage++;
-    }
-
-    pushTime = 0;
-  }
-}
-
-void configThrottle() {
-  throttleRange[0] = 4000;
-  throttleRange[1] = 4000;
-  while (digitalRead(MENU_BUTTON_PIN) == 1) {
-    int val = analogRead(THROTTLE_PIN);
-    if (val < throttleRange[0]) throttleRange[0] = val;
-    if (val > throttleRange[1]) throttleRange[1] = val;
-  }
-}
-
-void printText(int y, double data, char endChar) {
-  if (data > 10) {
-    char placeholder[6] = { ' ', ' ', ' ', ' ', endChar, '\0'};
-
-    u8g2.setCursor(ALIGN_CENTER(placeholder), y);
-    u8g2.print(data, 1);
-    u8g2.drawStr(ALIGN_CENTER(placeholder), y, placeholder);
   }
 }
