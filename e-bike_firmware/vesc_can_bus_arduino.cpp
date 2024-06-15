@@ -2,7 +2,9 @@
 #include <SPI.h>
 #include "vesc_can_bus_arduino.h"
 
-MCP_CAN CAN0(12);  // Set CS to pin 10
+#define CAN_CS 12
+
+MCP_CAN CAN0(CAN_CS);
 
 void CAN::initialize() {
   CAN0.begin(MCP_ANY, CAN_250KBPS, MCP_8MHZ);
@@ -42,7 +44,7 @@ void CAN::readCan() {
       inpVoltage = hex2int(receivedByte) * 0.1;
       break;
   }
-  //print_raw_can_data();  // uncomment to see raw can messages
+  //print_raw_can_data();
 }
 
 void CAN::print_raw_can_data() {
@@ -77,5 +79,5 @@ int CAN::hex2int(char buf[]) {
 }
 
 void CAN::get_frame() {
-  CAN0.readMsgBuf(&rxId, &len, rxBuf);  // Read data: len = data length, buf = data byte(s)
+  CAN0.readMsgBuf(&rxId, &len, rxBuf);
 }

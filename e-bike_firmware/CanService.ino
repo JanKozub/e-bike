@@ -6,7 +6,7 @@ void updateCanValues() {
     inputCurrent = can.avgMotorCurrent;
     dutyCycle = getDutyCycle();
     vescTemp = can.tempFET;
-    //motorTemp = can.tempMotor;
+    motorTemp = can.tempMotor;
     motorCurrent = can.avgMotorCurrent;
 
     lastCanRead = esp_timer_get_time();

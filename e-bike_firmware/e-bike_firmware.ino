@@ -30,6 +30,11 @@
 
 #define MAX_BATTERY_VOLTAGE 33.6
 
+enum AlignType {
+  CENTER,
+  RIGHT
+};
+
 U8G2_SH1106_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, U8X8_PIN_NONE, SCL_PIN, SDA_PIN);
 CAN can;
 
@@ -44,24 +49,11 @@ void setup(void) {
 
   u8g2.begin();
   can.initialize();
-  //Serial.begin(115200);
+  Serial.begin(115200);
 }
 
 void loop(void) {
   updateCanValues();
   handleButtonPress();
-
-  switch (currentPage) {
-    case 0:
-      drawMainPage();
-      break;
-    case 1:
-      drawDevValues1();
-      break;
-    case 2:
-      drawDevValues2();
-      break;
-    default:
-      drawMainPage();
-  }
+  printScreen();
 }
