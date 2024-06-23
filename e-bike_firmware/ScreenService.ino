@@ -22,10 +22,10 @@ void printScreen() {
 
 void drawMainPage() {
   u8g2.drawBox(0, 64 - map(dutyCycle, 0, 95, 0, 64), 20, 64);
-  u8g2.drawBox(108, 64 - map(40, 0, 80, 0, 64), 20, 64);
+  u8g2.drawBox(108, 64 - map(inputCurrent, 0, 70, 0, 64), 20, 64);
 
   u8g2.setFont(u8g2_font_10x20_tr);
-  printText(22, (inputVoltage / MAX_BATTERY_VOLTAGE * 100), '%', AlignType::CENTER);
+  printText(22, getBatteryProc(), '%', AlignType::CENTER);
   printText(42, inputCurrent, 'A', AlignType::CENTER);
   printText(62, inputVoltage, 'V', AlignType::CENTER);
 }

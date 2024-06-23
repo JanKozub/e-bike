@@ -28,6 +28,7 @@
 #define CAN0_INT 5
 #define CAN_REFRESH_RATE 25  // time in ms
 
+#define MIN_BATTERY_VOLTAGE 25.6
 #define MAX_BATTERY_VOLTAGE 33.6
 
 enum AlignType {
@@ -42,6 +43,7 @@ int currentPage = 0;
 bool menuButtonState = true;
 unsigned long lastCanRead = 0;
 float inputVoltage, dutyCycle, inputCurrent, motorCurrent, vescTemp, motorTemp;
+float batteryVoltageRange = MAX_BATTERY_VOLTAGE - MIN_BATTERY_VOLTAGE;
 
 void setup(void) {
   pinMode(MENU_BUTTON_PIN, INPUT_PULLUP);

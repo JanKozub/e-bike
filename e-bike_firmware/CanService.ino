@@ -13,6 +13,11 @@ void updateCanValues() {
   }
 }
 
+float getBatteryProc() {
+  float proc = (inputVoltage - MIN_BATTERY_VOLTAGE) / batteryVoltageRange;
+  return proc > 1 ? 100 : proc * 100;
+}
+
 float getDutyCycle() {
   return can.dutyCycleNow < 0 ? 0 : can.dutyCycleNow * 100;
 }
