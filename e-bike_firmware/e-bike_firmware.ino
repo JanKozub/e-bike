@@ -42,8 +42,8 @@ CAN can;
 int currentPage = 0;
 bool menuButtonState = true;
 unsigned long lastCanRead = 0;
-float inputVoltage, dutyCycle, inputCurrent, motorCurrent, vescTemp, motorTemp;
 float batteryVoltageRange = MAX_BATTERY_VOLTAGE - MIN_BATTERY_VOLTAGE;
+float inputVoltage, dutyCycle, inputCurrent, motorCurrent, vescTemp, motorTemp, batteryProcentage;
 
 void setup(void) {
   pinMode(MENU_BUTTON_PIN, INPUT_PULLUP);

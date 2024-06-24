@@ -14,8 +14,8 @@ void updateCanValues() {
 }
 
 float getBatteryProc() {
-  float proc = (inputVoltage - MIN_BATTERY_VOLTAGE) / batteryVoltageRange;
-  return proc > 1 ? 100 : proc * 100;
+  batteryProcentage = (inputVoltage - MIN_BATTERY_VOLTAGE) / batteryVoltageRange;
+  return batteryProcentage > 1 ? 100 : batteryProcentage * 100;
 }
 
 float getDutyCycle() {
